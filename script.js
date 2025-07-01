@@ -1,38 +1,46 @@
 // script.js
 
-const form = document.querySelector("#chat-form"); // Use ID for consistency
-const input = document.querySelector("#user-input"); // Use ID for consistency
+// Make sure you are using your specific IDs from your HTML
+const form = document.querySelector("#chat-form");
+const input = document.querySelector("#user-input");
 const chatContainer = document.querySelector("#chat-container");
 
-// The correct, full URL to your backend's chat endpoint
-const API_URL = "https://nexora-backend.onrender.com/chat";
+// The proven-working URL for your backend, with the correct /chat endpoint
+const API_URL = "https://nexora-ai-backend-1.onrender.com/chat";
 
-// This function adds a message to the chat interface
 function addMessage(sender, text) {
   const messageDiv = document.createElement("div");
+  // Ensure your CSS uses .message-user and .message-bot
   messageDiv.classList.add("message", sender === "user" ? "message-user" : "message-bot");
   messageDiv.textContent = text;
   chatContainer.appendChild(messageDiv);
   chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// This function sends the user's message to the backend
 async function sendMessage(text) {
+  // Display the user's message immediately
   addMessage("user", text);
 
   try {
-    const response = await fetch(API_URL, { // CHANGED: Using the correct full URL
+    const response = await fetch(API_URL, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ message: text }), // CHANGED: Sending "message" instead of "prompt"
+      // The backend expects the key to be "message"
+      body: JSON.stringify({ message: text }),
     });
+
+    // If the server responds with an error status (like 400 or 500)
+    if (!response.ok) {
+        // We throw an error to be caught by the catch block
+        throw new Error(`Server responded with status: ${response.status}`);
+    }
 
     const data = await response.json();
     
-    // CHANGED: Reading "response" from data, not "reply"
-    const reply = data.response || "Sorry, something went wrong on the server."; 
+    // The backend sends the key "response"
+    const reply = data.response; 
     addMessage("bot", reply);
 
   } catch (error) {
