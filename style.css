@@ -1,63 +1,55 @@
-
-body {
-  font-family: Arial, sans-serif;
-  background-color: #121212;
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
-}
-
-.chatbox {
-  background-color: #1f1f1f;
-  padding: 20px;
-  border-radius: 10px;
-  width: 90%;
-  max-width: 500px;
-}
+/* ... (body and chatbot styles are fine) ... */
 
 #chat-container {
-  max-height: 300px;
-  overflow-y: auto;
-  margin-bottom: 10px;
+    height: 60vh; /* Give it more height */
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 10px;
+    border-bottom: 1px solid #333;
 }
 
 .message {
-  margin: 5px 0;
-  padding: 10px;
-  border-radius: 5px;
+    margin-bottom: 10px;
+    padding: 10px 15px;
+    border-radius: 18px;
+    max-width: 85%;
+    line-height: 1.5;
 }
 
-.message.user {
-  background-color: #007bff;
-  color: white;
-  text-align: right;
+.message-user {
+    background-color: #007bff;
+    color: white;
+    align-self: flex-end; /* This won't work without display:flex on parent */
+    margin-left: auto; /* Use this to align right */
 }
 
-.message.bot {
-  background-color: #333;
-  color: white;
-  text-align: left;
+.message-bot {
+    background-color: #333;
+    color: white;
+    align-self: flex-start;
+    margin-right: auto; /* Use this to align left */
 }
 
-form {
-  display: flex;
+#chat-form {
+    display: flex;
+    padding: 20px 10px;
 }
 
-input[type="text"] {
-  flex: 1;
-  padding: 10px;
-  border: none;
-  border-radius: 5px 0 0 5px;
+#user-input {
+    flex-grow: 1;
+    padding: 10px;
+    border: 1px solid #444;
+    background-color: #333;
+    color: white;
+    border-radius: 20px;
+    margin-right: 10px;
 }
 
-button {
-  padding: 10px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 0 5px 5px 0;
-  cursor: pointer;
+#chat-form button {
+    padding: 10px 20px;
+    border: none;
+    background-color: #007bff;
+    color: white;
+    border-radius: 20px;
+    cursor: pointer;
 }
