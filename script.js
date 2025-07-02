@@ -1,41 +1,40 @@
-const form = document.querySelector("form");
-const chatContainer = document.querySelector("#chat-container");
+document.addEventListener('DOMContentLoaded', () => {
+    const chatForm = document.getElementById('chat-form');
+    const userInput = document.getElementById('user-input');
+    const chatBox = document.getElementById('chat-box');
 
-function addMessage(sender, text) {
-  const messageDiv = document.createElement("div");
-  messageDiv.classList.add("message", `message-${sender}`);
-  messageDiv.textContent = text;
-  chatContainer.appendChild(messageDiv);
-  chatContainer.scrollTop = chatContainer.scrollHeight;
-}
+    chatForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const userMessage = userInput.value.trim();
 
-async function sendMessage(text) {
-  addMessage("user", text);
+        if (userMessage) {
+            addMessage(userMessage, 'user-message');
+            userInput.value = '';
 
-  try {
-    const response = await fetch("https://nexora-ai-backend-1.onrender.com", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ message: text })
+            try {
+                const response = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ message: userMessage }),
+                });
+
+                const data = await response.json();
+                addMessage(data.response, 'bot-message');
+            } catch (error) {
+                console.error('Error:', error);
+                addMessage('Sorry, something went wrong.', 'bot-message');
+            }
+        }
     });
 
-    const data = await response.json();
-    const reply = data.reply || "Sorry, I couldn’t understand.";
-    addMessage("bot", reply);
-  } catch (error) {
-    addMessage("bot", "❌ Error contacting Nexora AI backend.");
-    console.error(error);
-  }
-}
-
-form.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const input = form.querySelector("input");
-  const text = input.value.trim();
-  if (text !== "") {
-    sendMessage(text);
-    input.value = "";
-  }
+    function addMessage(message, className) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', className);
+        messageElement.textContent = message;
+        chatBox.appendChild(messageElement);
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
 });
+                           
