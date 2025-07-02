@@ -1,40 +1,54 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const chatForm = document.getElementById('chat-form');
-    const userInput = document.getElementById('user-input');
-    const chatBox = document.getElementById('chat-box');
+const form = document.querySelector("#chat-form");
+const input = document.querySelector("#user-input");
+const chatContainer = document.querySelector("#chat-container");
 
-    chatForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const userMessage = userInput.value.trim();
+// The live URL for your Render backend, with the /chat endpoint.
+const API_URL = "https://nexora-ai-backend-1.onrender.com/chat";
 
-        if (userMessage) {
-            addMessage(userMessage, 'user-message');
-            userInput.value = '';
+function addMessage(sender, text) {
+  const messageDiv = document.createElement("div");
+  messageDiv.classList.add("message", sender === "user" ? "message-user" : "message-bot");
+  messageDiv.textContent = text;
+  chatContainer.appendChild(messageDiv);
+  chatContainer.scrollTop = chatContainer.scrollHeight;
+}
 
-            try {
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ message: userMessage }),
-                });
+async function sendMessage(text) {
+  // Display the user's message immediately
+  addMessage("user", text);
 
-                const data = await response.json();
-                addMessage(data.response, 'bot-message');
-            } catch (error) {
-                console.error('Error:', error);
-                addMessage('Sorry, something went wrong.', 'bot-message');
-            }
-        }
+  try {
+    const response = await fetch(API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      // The backend expects the key to be "message"
+      body: JSON.stringify({ message: text }),
     });
 
-    function addMessage(message, className) {
-        const messageElement = document.createElement('div');
-        messageElement.classList.add('message', className);
-        messageElement.textContent = message;
-        chatBox.appendChild(messageElement);
-        chatBox.scrollTop = chatBox.scrollHeight;
+    if (!response.ok) {
+        throw new Error(`Server responded with status: ${response.status}`);
     }
+
+    const data = await response.json();
+    
+    // The backend sends the key "response"
+    const reply = data.response; 
+    addMessage("bot", reply);
+
+  } catch (error) {
+    console.error("Error connecting to the backend:", error);
+    addMessage("bot", "An error occurred while connecting to Nexora AI.");
+  }
+}
+
+// Event listener for the form submission
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  const text = input.value.trim();
+  if (text) {
+    sendMessage(text);
+    input.value = "";
+  }
 });
-                           
